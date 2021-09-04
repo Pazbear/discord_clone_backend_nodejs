@@ -8,7 +8,6 @@ create TABLE USER(
     avatar varchar(50) not null,
     is_enabled tinyint(1) default null,
     certified_key varchar(50) default null,
-    created_at timestamp not null default current_timestamp,
     primary key(_id,email)
 );
 */
@@ -43,13 +42,15 @@ module.exports = (sequelize, DataTypes) => {
             allowNull:true,
             defaultValue : null
         },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('now()'),
-        },
     },
     {
-            timestamps:false,
+        sequelize,
+        timestamps: true,  //createdAt과 updatedAt을 생성
+        underscored: false, //테이블명과 컬럼명을 snake case로 변경
+        modelName: "USER",
+        tableName: "USER",
+        paranoid:false, // 삭제 시 완전삭제x, deletedAt에 기록
+        charset:'utf8mb4', //이모티콘까지 입력
+        collate:'utf8mb4_general_ci' //이모티콘까지 입력
     })
 }

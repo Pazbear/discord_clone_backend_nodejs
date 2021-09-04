@@ -4,25 +4,48 @@ const cors = require('cors')
 const fs = require('fs')
 const bodyParser = require('body-parser')
 const schedule = require('node-schedule')
+const dotenv = require('dotenv')
 
 const app = express()
 const router = express.Router()
 
+/***************** IMPORT ******************/
+const {Log} = require('./utils/Log')
+
+/*******************************************/
+/***************** SET UP ******************/
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-/***************** IMPORT ******************/
-const {Log} = require('./utils/Log')
-const {PORT} = require('./configs/InitConfig')
+/*******************************************/
+/*************** ENV Config ****************/
+dotenv.config({
+    path:path.resolve(
+        process.cwd(),
+        process.env.NODE_ENV == "production" ? "./env/.env" : "./env/.env.dev"
+    )
+})
 
 /*******************************************/
 /*****************SEQUELIZE*****************/
 
 const sequelize = require('./models').sequelize
-sequelize.sync()
+sequelize.sync({ force: false })
+.then(() => {
+    console.log('DB Connected');
+}).catch((err) => {
+    console.error(err);
+})
 
 /*******************************************/
+/******************ROUTES*******************/
+app.use('/api/user', require('./routes/user'))
+
+
+/*******************************************/
+
+
 /******************* PM2 *******************/
 /*let isDisableKeepAlive = false
 
@@ -49,7 +72,7 @@ app.use(router.get('/', (req, res) => {
     return res.send({success:true})
 }))
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT, () => {
     /*process.send(`ready`)*/
-    console.log(`Server Listening on ${PORT}`)
+    console.log(`Server Listening on ${process.env.PORT}`)
 })
