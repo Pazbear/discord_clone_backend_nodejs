@@ -2,3 +2,4 @@ node_modules/
 secuelize_config/
 deploy/
 env/
+config/

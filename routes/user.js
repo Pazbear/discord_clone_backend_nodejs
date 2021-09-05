@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const jwt = require('../modules/jwt')
 
 const { Log } = require('../utils/Log')
 
@@ -11,7 +12,7 @@ req => email:string, password:string, name:string, avatar:string
 res => success:boolean
 */
 /*********************************/
-router.post('/create', (req, res)=>{
+router.post('/create', async (req, res)=>{
     USER.create({
         email:req.body.email,
         password:req.body.password,

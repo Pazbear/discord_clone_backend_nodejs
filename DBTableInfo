@@ -1,0 +1,20 @@
+Table: USER
+Columns:
+    id int(11) AI PK 
+    email varchar(30) 
+    password varchar(100) 
+    name varchar(30) 
+    avatar varchar(50) 
+    is_enabled tinyint(1) 
+    certified_key varchar(50) 
+    createdAt datetime 
+    updatedAt datetime
+
+Table: SERVER
+Columns:
+    id int(11) AI PK 
+    name varchar(40) 
+    image varchar(50) 
+    createdAt datetime 
+    updatedAt datetime 
+    userId int(11)
