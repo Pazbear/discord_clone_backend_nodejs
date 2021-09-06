@@ -1,19 +1,23 @@
 const randToken = require('rand-token')
 const jwt = require('jsonwebtoken')
 const {secretKey, options} = require('../config/jwtconfig')
-const JWTConst = require('../constants/JWTConst.json')
+const JWTConst = require('../constants/JWTCONST')
 
 module.exports = {
-    sign: async(user) =>{
-        const payload = {
-            idx : user.id,
-            email : user.email,
+    sign: async(user, cb) =>{
+        try{
+            const payload = {
+                idx : user.id,
+                email : user.email,
+            }
+            const result = {
+                token : jwt.sign(payload, secretKey, options),
+                refreshToken : randToken.uid(256)
+            }
+            return cb(null, result)
+        }catch(err){
+            return cb(err)
         }
-        const result = {
-            token : jwt.sign(payload, secretKey, options),
-            refreshToken : randToken.uid(256)
-        }
-        return result
     },
     verify: async(token) =>{
         let decoded

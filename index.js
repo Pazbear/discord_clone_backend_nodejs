@@ -9,15 +9,17 @@ const dotenv = require('dotenv')
 const app = express()
 const router = express.Router()
 
-/***************** IMPORT ******************/
+/****************** UTIL *******************/
 const {Log} = require('./utils/Log')
-
+/*******************************************/
+/*************** MIDDLEWARE ****************/
+const auth = require('./middlewares/auth')
 /*******************************************/
 /***************** SET UP ******************/
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-
+app.use(auth())
 /*******************************************/
 /*************** ENV Config ****************/
 dotenv.config({
