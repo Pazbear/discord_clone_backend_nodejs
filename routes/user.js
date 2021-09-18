@@ -27,7 +27,7 @@ router.post('/signup', async (req, res)=>{
             avatar:req.body.avatar,
         }).catch(err =>{
             Log("e", `/api/user/signup failed\n${err}`)
-            return res.send({success:false, err})
+            return res.send({success:false, err, msg:MSG.DB_ERR})
         }).then(result => {
             Log("s", "/api/user/signup success")
             return res.send({success:true})
@@ -49,12 +49,34 @@ router.post('/signin', async(req, res)=>{
                         Log('e', `/api/user/signin failed\n${err}`)
                         return res.send({success:false, err})
                     }
-                    return res.send({success:true, result:user, token:JWTToken.token})
+                    if(user.token === req.body.token){
+                        return res.send({success:true, result:user, token:JWTToken.token})
+                    }else{
+                        USER.update({fcm_token:token}, {where: { email:req.body.email }})
+                        .catch(err => {
+                            Log("e", `/api/user/signin failed\n${err}`)
+                            return res.send({success:false, err, msg:MSG.DB_ERR})
+                        }).then(result => {
+                            Log("s", "/api/user/signin success")
+                            return res.send({success:true, result:user, token:JWTToken.token})
+                        })
+                    }
                 })
             }else{
                 return res.send({success:false, msg : MSG.LOGIN_FAILED_MSG})
             }
         })
+    }else{
+        return res.send({success:false, msg : MSG.NOT_USER})
+    }
+})
+
+router.post('/checkEmailValidate', async(req, res)=>{
+    const user = await USER.findOne({where:{email:req.body.email}})
+    if(user){
+        return res.send({success:false, msg:MSG.EMAIL_ALREADY_EXIST})
+    }else{
+        return res.send({success:true})
     }
 })
 

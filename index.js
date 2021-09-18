@@ -31,25 +31,25 @@ dotenv.config({
 
 /*******************************************/
 /*****************SEQUELIZE*****************/
-
-const sequelize = require('./models').sequelize
-sequelize.sync({ force: false })
-.then(() => {
-    console.log('DB Connected');
-}).catch((err) => {
-    console.error(err);
-})
-
+if (process.env.INSTANCE_ID == 0) {
+    const sequelize = require('./models').sequelize
+    sequelize.sync({ force: false })
+    .then(() => {
+        console.log('DB Connected');
+    }).catch((err) => {
+        console.error(err);
+    })
+}
 /*******************************************/
 /******************ROUTES*******************/
 app.use('/api/user', require('./routes/user'))
-
+app.use('/api/matching', require('./routes/matching'))
 
 /*******************************************/
 
 
 /******************* PM2 *******************/
-/*let isDisableKeepAlive = false
+let isDisableKeepAlive = false
 
 app.use((req, res, next) => {
     if (isDisableKeepAlive) {
@@ -66,7 +66,7 @@ process.on(`SIGINT`, async () => {
         process.exit(0)
     })
 })
-*/
+
 /*******************************************/
 
 app.use(router.get('/', (req, res) => {
@@ -76,5 +76,6 @@ app.use(router.get('/', (req, res) => {
 
 app.listen(process.env.PORT, () => {
     /*process.send(`ready`)*/
+    console.log(`${process.env.NODE_ENV}`)
     console.log(`Server Listening on ${process.env.PORT}`)
 })

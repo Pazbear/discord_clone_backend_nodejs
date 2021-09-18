@@ -35,9 +35,10 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 db.USER = require("./USER")(sequelize, Sequelize);
-db.SERVER = require("./SERVER")(sequelize, Sequelize);
+db.MATCHING = require("./MATCHING")(sequelize, Sequelize);
 
-db.USER.hasMany(db.SERVER)
-db.SERVER.belongsTo(db.USER)
+
+db.MATCHING.belongsTo(db.USER, {as : 'user1'});
+db.MATCHING.belongsTo(db.USER, {as : 'user2'});
 
 module.exports = db;

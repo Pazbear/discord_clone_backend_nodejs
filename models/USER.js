@@ -1,18 +1,3 @@
-/**********USER***********/
-/*
-create TABLE USER(
-	_id int auto_increment not null,
-    email varchar(30) not null,
-    password varchar(100) not null,
-    name varchar(30) not null,
-    avatar varchar(50) not null,
-    is_enabled tinyint(1) default null,
-    certified_key varchar(50) default null,
-    primary key(_id,email)
-);
-*/
-/*************************/
-
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('user', {
         email: {
@@ -30,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         avatar: {
             type:DataTypes.STRING(50),
-            allowNull:false,
+            allowNull:true,
         },
         is_enabled: {
             type:DataTypes.BOOLEAN,
@@ -42,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull:true,
             defaultValue : null
         },
+        fcm_token:{
+            type:DataTypes.STRING(200),
+            allowNull:true,
+            defaultValue : null
+        }
     },
     {
         sequelize,
