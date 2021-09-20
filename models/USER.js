@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
             type:DataTypes.STRING(200),
             allowNull:true,
             defaultValue : null
+        },
+        isMatched:{
+            type:DataTypes.BOOLEAN,
+            allowNull:false,
+            defaultValue : false
         }
     },
     {

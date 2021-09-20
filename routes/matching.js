@@ -11,13 +11,13 @@ router.post('/getMatching', async(req, res)=>{
         [Sequelize.Op.or]:[
             {
                 [Sequelize.Op.and]:[
-                    {user1Id : req.body.userId},
+                    {user1Id : req.id},
                     {createdAt : req.body.nowDate}
                 ]
             },
             {
                 [Sequelize.Op.and]:[
-                    {user2Id : req.body.userId},
+                    {user2Id : req.id},
                     {createdAt : req.body.nowDate}
                 ]
             }
@@ -35,18 +35,28 @@ router.post('/getMatching', async(req, res)=>{
 })
 
 router.post('/setMatching', async(req, res)=>{
-    const randUser = await USER.findAll({where:{
-        id : { $not : req.body.userId}
-    }},{
-        order:Sequelize.literal('rand()'), limit : 1
-    })
+    const randUser = await USER.findOne(
+        {
+            where:{
+                [Sequelize.Op.and]:[
+                    {
+                        [Sequelize.Op.not]:[{id : req.id}]
+                    },
+                    {
+                        isMatched:0
+                    }
+                ]
+            },
+            order:[Sequelize.literal('rand()')]
+        })
+    console.log(randUser)
     const partner = {
         name : randUser.name,
         avatar : randUser.avatar,
         fcm_token : randUser.fcm_token
     }
     MATCHING.create({
-        user1Id:userId,
+        user1Id:req.id,
         user2Id:randUser.id,
         createdAt:req.body.nowDate
     }).catch(err =>{
@@ -57,7 +67,14 @@ router.post('/setMatching', async(req, res)=>{
         if(!result){
             return res.send({success:true, err, msg:MSG.NOT_MATCHED})
         }
-        return res.send({success:true, result:partner})
+        USER.update({isMatched:true}, {where:{
+            [Sequelize.Op.or]:[{id:req.id},{id:randUser.id}]
+        }}).catch(err =>{
+            Log("e", `/api/matching/setMatching failed\n${err}`)
+            return res.send({success:false, err, msg:MSG.DB_ERR})
+        }).then(result =>{
+            return res.send({success:true, result:partner})
+        })
     })
 })
 
