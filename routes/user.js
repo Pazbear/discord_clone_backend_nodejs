@@ -18,7 +18,7 @@ router.post('/signup', async (req, res)=>{
     encrypt.encryptPassword(req.body.password, (err, hash) =>{
         if(err){
             Log('e', `/api/user/signup failed\n${err}`)
-            res.send({success:false, err})
+            res.send({success:false})
         }
         USER.create({
             email:req.body.email,
@@ -27,7 +27,7 @@ router.post('/signup', async (req, res)=>{
             avatar:req.body.avatar,
         }).catch(err =>{
             Log("e", `/api/user/signup failed\n${err}`)
-            return res.send({success:false, err, msg:MSG.DB_ERR})
+            return res.send({success:false, msg:MSG.DB_ERR})
         }).then(result => {
             Log("s", "/api/user/signup success")
             return res.send({success:true})
@@ -41,28 +41,30 @@ router.post('/signin', async(req, res)=>{
         encrypt.comparePassword(req.body.password, user.password, (err, isMatch)=>{
             if(err){
                 Log('e', `/api/user/signin failed\n${err}`)
-                return res.send({success:false, err})
+                return res.send({success:false})
             }
             if(isMatch){
                 jwt.sign(user, (err, JWTToken)=>{
                     if(err){
                         Log('e', `/api/user/signin failed\n${err}`)
-                        return res.send({success:false, err})
+                        return res.send({success:false})
                     }
-                    if(user.token === req.body.token){
+                    if(user.token === req.body.fcm_token){
+                        Log("s", "/api/user/signin success(same phone)")
                         return res.send({success:true, result:user, token:JWTToken.token})
                     }else{
-                        USER.update({fcm_token:token}, {where: { email:req.body.email }})
+                        USER.update({fcm_token:req.body.fcm_token}, {where: { email:req.body.email }})
                         .catch(err => {
                             Log("e", `/api/user/signin failed\n${err}`)
-                            return res.send({success:false, err, msg:MSG.DB_ERR})
+                            return res.send({success:false, msg:MSG.DB_ERR})
                         }).then(result => {
-                            Log("s", "/api/user/signin success")
+                            Log("s", "/api/user/signin success(other phone)")
                             return res.send({success:true, result:user, token:JWTToken.token})
                         })
                     }
                 })
             }else{
+                Log("e", `/api/user/signin failed\n`)
                 return res.send({success:false, msg : MSG.LOGIN_FAILED_MSG})
             }
         })

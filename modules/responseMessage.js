@@ -9,6 +9,7 @@ responseMessage = {
 
     NOT_USER:"해당 유저가 없습니다.",
     NOT_MATCHED:"아직 매칭되지 않았습니다.",
+    MATCH_USER_NOT_EXIST:"매칭 상대가 현재 존재하지 않습니다.",
 
     DB_ERR:"DB 오류"
 }
